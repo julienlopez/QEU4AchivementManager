@@ -1,1 +1,4 @@
 CMakeLists.txt.user
+CMakeSettings.json
+.vs/*
+out/*

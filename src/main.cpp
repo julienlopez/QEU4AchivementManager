@@ -1,5 +1,8 @@
+#include "datamanager.hpp"
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 
 int main(int argc, char* argv[])
 {
@@ -8,6 +11,9 @@ int main(int argc, char* argv[])
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+    auto* data_manager = new DataManager(engine.networkAccessManager(), &app);
+    engine.rootContext()->setContextProperty("data_manager", data_manager);
+
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app,
                      [url](QObject* obj, const QUrl& objUrl) {
@@ -15,6 +21,8 @@ int main(int argc, char* argv[])
                      },
                      Qt::QueuedConnection);
     engine.load(url);
+
+    data_manager->checkOrDownloadData();
 
     return app.exec();
 }

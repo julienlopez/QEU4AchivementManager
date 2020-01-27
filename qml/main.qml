@@ -15,6 +15,8 @@ Window {
         anchors.centerIn: parent
         color: "#ededed"
 
+        visible: data_manager.is_working
+
         Text {
             id: splash_text
             text: qsTr("Preparing env")

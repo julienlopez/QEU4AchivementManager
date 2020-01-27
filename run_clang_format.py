@@ -9,10 +9,9 @@ def processDirectory(directory):
 				subprocess.call(["clang-format", "-i", os.path.join(root, i)])
 
 root_path=os.getcwd()
-processDirectory(root_path)
 
 directories = [ d for d in os.listdir(root_path) if os.path.isdir(os.path.join(root_path, d)) ]
 for directory in directories:
-	if directory == "3rd_party" or directory.startswith("build"):
+	if directory == "3rd_party" or directory.startswith("build") or directory.startswith(".vs"):
 		continue
 	processDirectory(os.path.join(root_path, directory))

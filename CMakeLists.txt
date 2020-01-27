@@ -26,15 +26,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt5 COMPONENTS Core Quick Network REQUIRED)
 
+file (GLOB CppSrc
+        src/*.cpp
+		src/*.hpp
+)
+
 if(ANDROID)
     add_library(QEU4AchivementManager SHARED
-      src/main.cpp
+      ${CppSrc}
       qml.qrc
       images.qrc
     )
 else()
     add_executable(QEU4AchivementManager
-      src/main.cpp
+      ${CppSrc}
       qml.qrc
       images.qrc
     )

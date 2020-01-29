@@ -2,6 +2,8 @@
 
 #include <QObject>
 
+#include <functional>
+
 class QNetworkAccessManager;
 
 class FileDownloader : public QObject

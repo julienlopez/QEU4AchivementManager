@@ -1,5 +1,6 @@
 #include "datamanager.hpp"
 
+#include "achivementhtmlparser.hpp"
 #include "filedownloader.hpp"
 
 #include <QDir>
@@ -55,17 +56,10 @@ QFileInfo DataManager::dataImagesFolder() const
 #include <QDebug>
 void DataManager::parseAchievementHtml(QByteArray html)
 {
+    const auto res = AchivementHtmlParser{dataFolder().absolutePath()}.parse(html);
+
     qDebug() << "DataManager::parseAchievementHtml done!";
-    qDebug() << html.size();
-
-    const auto start_pos = html.indexOf("<table");
-    const auto end_pos = html.indexOf("</table>", start_pos);
-    html = html.mid(start_pos, end_pos - start_pos);
-
-    auto* f = new QFile(QDir{QGuiApplication::applicationDirPath()}.absoluteFilePath("res.txt"));
-    f->open(QIODevice::WriteOnly);
-    f->write(html);
-    qDebug() << "write done!";
+    qDebug() << res.size();
 
     setIsWorking(false);
 }

@@ -31,6 +31,8 @@ file (GLOB CppSrc
 		src/*.hpp
 )
 
+include_directories("submodules/expected/include")
+
 if(ANDROID)
     add_library(QEU4AchivementManager SHARED
       ${CppSrc}

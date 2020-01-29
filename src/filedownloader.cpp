@@ -9,21 +9,25 @@ FileDownloader::FileDownloader(QNetworkAccessManager* network_manager, QObject* 
 {
 }
 
-void FileDownloader::downloadFile(QNetworkAccessManager* const network_manager, const QUrl& url,
-                                  std::function<void(QByteArray)> callback, QObject* parent)
+void FileDownloader::downloadFile(QNetworkAccessManager* const network_manager, const QUrl& url, Callback_t callback,
+                                  QObject* parent)
 {
     auto* downloader = new FileDownloader(network_manager, parent);
     downloader->grabFile(url, callback);
 }
 
-void FileDownloader::grabFile(const QUrl& url, std::function<void(QByteArray)> callback)
+void FileDownloader::grabFile(const QUrl& url, Callback_t callback)
 {
     connect(m_network_manager, &QNetworkAccessManager::finished,
             [ c = std::move(callback), self = this ](QNetworkReply * reply) {
                 auto data = reply->readAll();
+                const auto error = reply->error();
                 reply->deleteLater();
                 self->deleteLater();
-                c(std::move(data));
+                if(error == QNetworkReply::NoError)
+                    c(std::move(data));
+                else
+                    c(tl::make_unexpected("Unable to download the wiki page"));
             });
     m_network_manager->get(QNetworkRequest{url});
 }

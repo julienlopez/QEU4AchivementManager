@@ -4,25 +4,49 @@
 
 #include <QDebug>
 
+namespace
+{
+
+Result<QByteArray> extractTheFirstTable(const QByteArray& html)
+{
+    auto start_pos = html.indexOf("<table");
+    start_pos = html.indexOf('<', start_pos + 1); // to remove the <table part
+    const auto end_pos = html.indexOf("</table>", start_pos);
+    return html.mid(start_pos, end_pos - start_pos);
+}
+
+auto writeCurrentHtmlContent(const QString& file_path)
+{
+    return [file_path](QByteArray html) -> QByteArray {
+        auto* f = new QFile{file_path};
+        f->open(QIODevice::WriteOnly);
+        f->write(html);
+        f->deleteLater();
+        qDebug() << "write done!";
+        return html;
+    };
+}
+
+QByteArray removeEmptyLines(QByteArray html)
+{
+    return html.replace("\n\n", "\n");
+}
+
+Result<QList<Achivemevent>> parseAchivements(QByteArray html)
+{
+    return {};
+}
+}
+
 AchivementHtmlParser::AchivementHtmlParser(const QDir& data_folder)
     : m_data_folder(data_folder)
 {
 }
 
-QList<Achivemevent> AchivementHtmlParser::parse(const QByteArray& full_html)
+Result<QList<Achivemevent>> AchivementHtmlParser::parse(const QByteArray& full_html)
 {
-    qDebug() << "DataManager::parseAchievementHtml done!";
-    qDebug() << full_html.size();
-
-    const auto start_pos = full_html.indexOf("<table");
-    const auto end_pos = full_html.indexOf("</table>", start_pos);
-    auto html = full_html.mid(start_pos, end_pos - start_pos);
-    html.replace("\n\n", "\n");
-
-    auto* f = new QFile{m_data_folder.absoluteFilePath("res.txt")};
-    f->open(QIODevice::WriteOnly);
-    f->write(html);
-    qDebug() << "write done!";
-
-    return {};
+    return extractTheFirstTable(full_html)
+        .map(&removeEmptyLines)
+        .map(writeCurrentHtmlContent(m_data_folder.absoluteFilePath("res.txt")))
+        .and_then(&parseAchivements);
 }

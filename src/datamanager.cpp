@@ -54,12 +54,21 @@ QFileInfo DataManager::dataImagesFolder() const
     return QFileInfo{QDir{dataFolder().absolutePath()}.absoluteFilePath("images")};
 }
 #include <QDebug>
-void DataManager::parseAchievementHtml(QByteArray html)
+void DataManager::parseAchievementHtml(Result<QByteArray> html)
 {
-    const auto res = AchivementHtmlParser{dataFolder().absolutePath()}.parse(html);
+    AchivementHtmlParser parser{dataFolder().absolutePath()};
 
-    qDebug() << "DataManager::parseAchievementHtml done!";
-    qDebug() << res.size();
+    html.and_then([&parser](QByteArray html) { return parser.parse(html); })
+        .map([](const QList<Achivemevent>& res) {
+            qDebug() << "DataManager::parseAchievementHtml done!";
+            qDebug() << res.size();
+            return res;
+        })
+        .or_else([](const QString& error) { qDebug() << "error: " << error; });
+    // .map_error([](const QString& error) -> QString {
+    //     qDebug() << "error: " << error;
+    //     return error;
+    // });
 
     setIsWorking(false);
 }

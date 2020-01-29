@@ -1,6 +1,7 @@
 #pragma once
 
 #include "achivement.hpp"
+#include "result.hpp"
 
 #include <QByteArray>
 #include <QDir>
@@ -13,7 +14,7 @@ public:
 
     ~AchivementHtmlParser() = default;
 
-    QList<Achivemevent> parse(const QByteArray& full_html);
+    Result<QList<Achivemevent>> parse(const QByteArray& full_html);
 
 private:
     const QDir m_data_folder;

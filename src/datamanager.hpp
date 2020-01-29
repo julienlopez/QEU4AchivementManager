@@ -1,5 +1,7 @@
 #pragma once
 
+#include "result.hpp"
+
 #include <QObject>
 
 class QFileInfo;
@@ -36,5 +38,5 @@ private:
     QFileInfo dataFolder() const;
     QFileInfo dataImagesFolder() const;
 
-    void parseAchievementHtml(QByteArray html);
+    void parseAchievementHtml(Result<QByteArray> html);
 };

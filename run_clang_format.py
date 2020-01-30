@@ -12,6 +12,6 @@ root_path=os.getcwd()
 
 directories = [ d for d in os.listdir(root_path) if os.path.isdir(os.path.join(root_path, d)) ]
 for directory in directories:
-	if directory == "3rd_party" or directory.startswith("build") or directory.startswith(".vs"):
+	if directory == "submodules" or directory.startswith("build") or directory.startswith(".vs"):
 		continue
 	processDirectory(os.path.join(root_path, directory))

@@ -2,6 +2,8 @@
 
 #include <QFile>
 
+#include <QRegularExpression>
+
 #include <QDebug>
 
 namespace
@@ -17,10 +19,10 @@ Result<QByteArray> extractTheFirstTable(const QByteArray& html)
 
 auto writeCurrentHtmlContent(const QString& file_path)
 {
-    return [file_path](QByteArray html) -> QByteArray {
+    return [file_path](QStringList html) -> QStringList {
         auto* f = new QFile{file_path};
         f->open(QIODevice::WriteOnly);
-        f->write(html);
+        f->write(html.join("\n\n").toUtf8());
         f->deleteLater();
         qDebug() << "write done!";
         return html;
@@ -40,7 +42,21 @@ QByteArray removeTBodyTags(QByteArray html)
     return html.mid(start, html.size() - end - start);
 }
 
-Result<QList<Achivemevent>> parseAchivements(QByteArray html)
+QStringList splitByLines(QString html)
+{
+    if(html.startsWith("<tr>")) html = html.right(html.size() - 4);
+    if(html.endsWith("</tr>")) html.chop(5);
+    return html.trimmed().split(QRegularExpression("</tr>\\n*<tr>"));
+}
+
+QStringList removeHeaderLine(QStringList lines)
+{
+    const auto& first_line = lines.front();
+    if(first_line.startsWith("<th") && first_line.endsWith("</th>")) lines.pop_front();
+    return lines;
+}
+
+Result<QList<Achivemevent>> parseAchivements(QStringList html)
 {
     return {};
 }
@@ -56,6 +72,8 @@ Result<QList<Achivemevent>> AchivementHtmlParser::parse(const QByteArray& full_h
     return extractTheFirstTable(full_html)
         .map(&removeEmptyLines)
         .map(&removeTBodyTags)
+        .map(&splitByLines)
+        .map(&removeHeaderLine)
         .map(writeCurrentHtmlContent(m_data_folder.absoluteFilePath("res.txt")))
         .and_then(&parseAchivements);
 }

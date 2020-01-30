@@ -4,5 +4,4 @@
 
 #include <QString>
 
-template<class T>
-using Result = tl::expected<T, QString>;
+template <class T> using Result = tl::expected<T, QString>;

@@ -32,6 +32,14 @@ QByteArray removeEmptyLines(QByteArray html)
     return html.replace("\n\n", "\n");
 }
 
+QByteArray removeTBodyTags(QByteArray html)
+{
+    const auto start = html.startsWith("<tbody>") ? 7 : 0;
+    auto end = html.endsWith("</tbody>") ? 8 : 0;
+    if(html.at(html.size() - end - 1) == '\n') end++;
+    return html.mid(start, html.size() - end - start);
+}
+
 Result<QList<Achivemevent>> parseAchivements(QByteArray html)
 {
     return {};
@@ -47,6 +55,7 @@ Result<QList<Achivemevent>> AchivementHtmlParser::parse(const QByteArray& full_h
 {
     return extractTheFirstTable(full_html)
         .map(&removeEmptyLines)
+        .map(&removeTBodyTags)
         .map(writeCurrentHtmlContent(m_data_folder.absoluteFilePath("res.txt")))
         .and_then(&parseAchivements);
 }

@@ -3,20 +3,14 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
-FileDownloader::FileDownloader(QNetworkAccessManager* network_manager, QObject* parent)
+FileDownloader::FileDownloader(const QString& root_domain, QNetworkAccessManager* network_manager, QObject* parent)
     : QObject(parent)
+    , m_root_domain(root_domain)
     , m_network_manager(network_manager)
 {
 }
 
-void FileDownloader::downloadFile(QNetworkAccessManager* const network_manager, const QUrl& url, Callback_t callback,
-                                  QObject* parent)
-{
-    auto* downloader = new FileDownloader(network_manager, parent);
-    downloader->grabFile(url, callback);
-}
-
-void FileDownloader::grabFile(const QUrl& url, Callback_t callback)
+void FileDownloader::downloadFile(const QString& url, Callback_t callback)
 {
     connect(m_network_manager, &QNetworkAccessManager::finished,
             [ c = std::move(callback), self = this ](QNetworkReply * reply) {
@@ -29,5 +23,5 @@ void FileDownloader::grabFile(const QUrl& url, Callback_t callback)
                 else
                     c(tl::make_unexpected("Unable to download the wiki page"));
             });
-    m_network_manager->get(QNetworkRequest{url});
+    m_network_manager->get(QNetworkRequest{QUrl(m_root_domain + url)});
 }

@@ -5,8 +5,9 @@
 
 #include <QObject>
 
-class QFileInfo;
+class FileDownloader;
 
+class QFileInfo;
 class QNetworkAccessManager;
 
 class DataManager : public QObject
@@ -28,8 +29,9 @@ signals:
     void isWorkingChanged(bool);
 
 private:
-    QNetworkAccessManager* const m_network_manager;
+    FileDownloader* m_file_downloader;
     bool m_is_working = false;
+    const QList<Achivemevent> m_achivements;
 
     void setIsWorking(bool b);
 
@@ -43,7 +45,7 @@ private:
 
     void saveAchivements(const QList<Achivemevent>& res);
 
-    QList<Achivemevent> downloadImages(const QList<Achivemevent>& res);
+    void downloadImages();
 
-    QList<Achivemevent> writeJsonFile(const QList<Achivemevent>& res);
+    void writeJsonFile();
 };

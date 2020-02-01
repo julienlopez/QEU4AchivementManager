@@ -8,10 +8,12 @@
 #include <QGuiApplication>
 #include <QUrl>
 
+using std::placeholders::_1;
+
 DataManager::DataManager(QNetworkAccessManager* network_manager, QObject* parent)
     : QObject(parent)
-    , m_network_manager(network_manager)
 {
+    m_file_downloader = new FileDownloader("https://eu4.paradoxwikis.com/", network_manager);
 }
 
 bool DataManager::isWorking() const
@@ -23,9 +25,8 @@ void DataManager::checkOrDownloadData()
 {
     if(isDataFolderComplete()) return;
     setIsWorking(true);
-    FileDownloader::downloadFile(
-        m_network_manager, QUrl("https://eu4.paradoxwikis.com/Achievements"),
-        std::bind(std::mem_fn(&DataManager::parseAchievementHtml), this, std::placeholders::_1));
+    m_file_downloader->downloadFile("Achievements",
+                                    std::bind(std::mem_fn(&DataManager::parseAchievementHtml), this, _1));
 }
 
 void DataManager::setIsWorking(bool b)
@@ -56,7 +57,6 @@ QFileInfo DataManager::dataImagesFolder() const
 #include <QDebug>
 void DataManager::parseAchievementHtml(Result<QByteArray> html)
 {
-    using std::placeholders::_1;
     AchivementHtmlParser parser{dataFolder().absolutePath()};
 
     html.and_then([&parser](QByteArray html) { return parser.parse(html); })
@@ -74,10 +74,10 @@ void DataManager::saveAchivements(const QList<Achivemevent>& res)
 {
 }
 
-QList<Achivemevent> DataManager::downloadImages(const QList<Achivemevent>& res)
+void DataManager::downloadImages()
 {
 }
 
-QList<Achivemevent> DataManager::writeJsonFile(const QList<Achivemevent>& res)
+void DataManager::writeJsonFile()
 {
 }

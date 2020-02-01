@@ -56,6 +56,7 @@ QFileInfo DataManager::dataImagesFolder() const
 #include <QDebug>
 void DataManager::parseAchievementHtml(Result<QByteArray> html)
 {
+    using std::placeholders::_1;
     AchivementHtmlParser parser{dataFolder().absolutePath()};
 
     html.and_then([&parser](QByteArray html) { return parser.parse(html); })
@@ -64,11 +65,19 @@ void DataManager::parseAchievementHtml(Result<QByteArray> html)
             qDebug() << res.size();
             return res;
         })
+        .map(std::bind(&DataManager::saveAchivements, this, _1))
         .or_else([](const QString& error) { qDebug() << "error: " << error; });
-    // .map_error([](const QString& error) -> QString {
-    //     qDebug() << "error: " << error;
-    //     return error;
-    // });
-
     setIsWorking(false);
+}
+
+void DataManager::saveAchivements(const QList<Achivemevent>& res)
+{
+}
+
+QList<Achivemevent> DataManager::downloadImages(const QList<Achivemevent>& res)
+{
+}
+
+QList<Achivemevent> DataManager::writeJsonFile(const QList<Achivemevent>& res)
+{
 }

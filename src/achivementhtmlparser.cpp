@@ -42,11 +42,16 @@ QByteArray removeTBodyTags(QByteArray html)
     return html.mid(start, html.size() - end - start);
 }
 
+QStringList splitByTag(QString html, const QString& open_tag, const QString& close_tag)
+{
+    if(html.startsWith(open_tag)) html = html.right(html.size() - 4);
+    if(html.endsWith(close_tag)) html.chop(5);
+    return html.trimmed().split(QRegularExpression(close_tag + "\\n*" + open_tag));
+}
+
 QStringList splitByLines(QString html)
 {
-    if(html.startsWith("<tr>")) html = html.right(html.size() - 4);
-    if(html.endsWith("</tr>")) html.chop(5);
-    return html.trimmed().split(QRegularExpression("</tr>\\n*<tr>"));
+    return splitByTag(html, "<tr>", "</tr>");
 }
 
 QStringList removeHeaderLine(QStringList lines)
@@ -56,11 +61,45 @@ QStringList removeHeaderLine(QStringList lines)
     return lines;
 }
 
-Result<QList<Achivemevent>> parseAchivements(QStringList html)
+QString removeUpTo(QString str, const QString& token)
 {
-    return {};
+    const auto pos = str.indexOf(token);
+    return str.right(str.size() - pos - token.size());
 }
+
+auto parseTitleColumn(QString html)
+{
+    html = removeUpTo(html, "<img ");
+    html = removeUpTo(html, "src=\"");
+    const auto image_url = html.left(html.indexOf("\""));
+    html = removeUpTo(html, "<div ");
+    html = removeUpTo(html, "<div ");
+    html = removeUpTo(html, ">");
+    const auto title = html.left(html.indexOf("<"));
+    html = removeUpTo(html, "<div ");
+    html = removeUpTo(html, ">");
+    const auto description = html.left(html.indexOf("<"));
+    return Achivemevent{title, description, image_url};
 }
+
+Result<Achivemevent> parseAchivement(QString html)
+{
+    auto parts = splitByTag(html, "<td", "</td>");
+    if(parts.size() != 7) return tl::make_unexpected("not enough columns");
+    const auto res = parseTitleColumn(parts.front());
+    return res;
+}
+
+QList<Achivemevent> parseAchivements(QStringList html)
+{
+    QList<Achivemevent> achivements;
+    for(const auto& line : html)
+    {
+        parseAchivement(line).map([&achivements](Achivemevent a) { achivements << a; });
+    }
+    return achivements;
+}
+} // namespace
 
 AchivementHtmlParser::AchivementHtmlParser(const QDir& data_folder)
     : m_data_folder(data_folder)
@@ -74,6 +113,6 @@ Result<QList<Achivemevent>> AchivementHtmlParser::parse(const QByteArray& full_h
         .map(&removeTBodyTags)
         .map(&splitByLines)
         .map(&removeHeaderLine)
-        .map(writeCurrentHtmlContent(m_data_folder.absoluteFilePath("res.txt")))
-        .and_then(&parseAchivements);
+        // .map(writeCurrentHtmlContent(m_data_folder.absoluteFilePath("res.txt")))
+        .map(&parseAchivements);
 }

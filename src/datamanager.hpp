@@ -1,5 +1,6 @@
 #pragma once
 
+#include "achivement.hpp"
 #include "result.hpp"
 
 #include <QObject>
@@ -39,4 +40,10 @@ private:
     QFileInfo dataImagesFolder() const;
 
     void parseAchievementHtml(Result<QByteArray> html);
+
+    void saveAchivements(const QList<Achivemevent>& res);
+
+    QList<Achivemevent> downloadImages(const QList<Achivemevent>& res);
+
+    QList<Achivemevent> writeJsonFile(const QList<Achivemevent>& res);
 };

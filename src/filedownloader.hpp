@@ -22,6 +22,8 @@ public:
 
     void downloadFile(const QString& url, Callback_t callback);
 
+    static bool writeFile(const QString& file_path, const QByteArray& data);
+
 private:
     const QString m_root_domain;
     QNetworkAccessManager* m_network_manager;

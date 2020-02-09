@@ -1,5 +1,6 @@
 #include "filedownloader.hpp"
 
+#include <QFile>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
@@ -12,16 +13,27 @@ FileDownloader::FileDownloader(const QString& root_domain, QNetworkAccessManager
 
 void FileDownloader::downloadFile(const QString& url, Callback_t callback)
 {
-    connect(m_network_manager, &QNetworkAccessManager::finished,
-            [ c = std::move(callback), self = this ](QNetworkReply * reply) {
-                auto data = reply->readAll();
-                const auto error = reply->error();
-                reply->deleteLater();
-                self->deleteLater();
-                if(error == QNetworkReply::NoError)
-                    c(std::move(data));
-                else
-                    c(tl::make_unexpected("Unable to download the wiki page"));
-            });
-    m_network_manager->get(QNetworkRequest{QUrl(m_root_domain + url)});
+    auto* reply = m_network_manager->get(QNetworkRequest{QUrl(m_root_domain + url)});
+    connect(reply, &QNetworkReply::finished, [reply, c = std::move(callback)]() {
+        auto data = reply->readAll();
+        const auto error = reply->error();
+        reply->deleteLater();
+        if(error == QNetworkReply::NoError)
+            c(std::move(data));
+        else
+        {
+            qDebug() << "error: " << error;
+            c(tl::make_unexpected("Unable to download the wiki page"));
+        }
+    });
+}
+
+bool FileDownloader::writeFile(const QString& file_path, const QByteArray& data)
+{
+    bool res = false;
+    auto* f = new QFile{file_path};
+    if(f->open(QIODevice::WriteOnly))
+        if(f->write(data) == data.size()) res = true;
+    f->deleteLater();
+    return res;
 }

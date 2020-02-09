@@ -1,4 +1,5 @@
 #include "achivementhtmlparser.hpp"
+#include "filedownloader.hpp"
 
 #include <QFile>
 
@@ -20,10 +21,7 @@ Result<QByteArray> extractTheFirstTable(const QByteArray& html)
 auto writeCurrentHtmlContent(const QString& file_path)
 {
     return [file_path](QStringList html) -> QStringList {
-        auto* f = new QFile{file_path};
-        f->open(QIODevice::WriteOnly);
-        f->write(html.join("\n\n").toUtf8());
-        f->deleteLater();
+        FileDownloader::writeFile(file_path, html.join("\n\n").toUtf8());
         qDebug() << "write done!";
         return html;
     };

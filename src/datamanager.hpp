@@ -31,9 +31,11 @@ signals:
 private:
     FileDownloader* m_file_downloader;
     bool m_is_working = false;
-    const QList<Achivemevent> m_achivements;
+    QList<Achivemevent> m_achivements;
 
     void setIsWorking(bool b);
+
+    void createDataFolder();
 
     bool isDataFolderComplete() const;
 

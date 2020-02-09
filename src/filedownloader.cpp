@@ -14,7 +14,7 @@ FileDownloader::FileDownloader(const QString& root_domain, QNetworkAccessManager
 void FileDownloader::downloadFile(const QString& url, Callback_t callback)
 {
     auto* reply = m_network_manager->get(QNetworkRequest{QUrl(m_root_domain + url)});
-    connect(reply, &QNetworkReply::finished, [reply, c = std::move(callback)]() {
+    connect(reply, &QNetworkReply::finished, [ reply, c = std::move(callback) ]() {
         auto data = reply->readAll();
         const auto error = reply->error();
         reply->deleteLater();

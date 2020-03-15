@@ -1,9 +1,13 @@
 #pragma once
 
+#include "achivement.hpp"
+#include "result.hpp"
+
 #include <QObject>
 
-class QFileInfo;
+class FileDownloader;
 
+class QFileInfo;
 class QNetworkAccessManager;
 
 class DataManager : public QObject
@@ -25,10 +29,13 @@ signals:
     void isWorkingChanged(bool);
 
 private:
-    QNetworkAccessManager* const m_network_manager;
+    FileDownloader* m_file_downloader;
     bool m_is_working = false;
+    QList<Achivemevent> m_achivements;
 
     void setIsWorking(bool b);
+
+    void createDataFolder();
 
     bool isDataFolderComplete() const;
 
@@ -36,5 +43,11 @@ private:
     QFileInfo dataFolder() const;
     QFileInfo dataImagesFolder() const;
 
-    void parseAchievementHtml(QByteArray html);
+    void parseAchievementHtml(Result<QByteArray> html);
+
+    void saveAchivements(const QList<Achivemevent>& res);
+
+    void downloadImages();
+
+    void writeJsonFile();
 };

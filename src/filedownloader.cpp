@@ -1,29 +1,39 @@
 #include "filedownloader.hpp"
 
+#include <QFile>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
-FileDownloader::FileDownloader(QNetworkAccessManager* network_manager, QObject* parent)
+FileDownloader::FileDownloader(const QString& root_domain, QNetworkAccessManager* network_manager, QObject* parent)
     : QObject(parent)
+    , m_root_domain(root_domain)
     , m_network_manager(network_manager)
 {
 }
 
-void FileDownloader::downloadFile(QNetworkAccessManager* const network_manager, const QUrl& url,
-                                  std::function<void(QByteArray)> callback, QObject* parent)
+void FileDownloader::downloadFile(const QString& url, Callback_t callback)
 {
-    auto* downloader = new FileDownloader(network_manager, parent);
-    downloader->grabFile(url, callback);
+    auto* reply = m_network_manager->get(QNetworkRequest{QUrl(m_root_domain + url)});
+    connect(reply, &QNetworkReply::finished, [ reply, c = std::move(callback) ]() {
+        auto data = reply->readAll();
+        const auto error = reply->error();
+        reply->deleteLater();
+        if(error == QNetworkReply::NoError)
+            c(std::move(data));
+        else
+        {
+            qDebug() << "error: " << error;
+            c(tl::make_unexpected("Unable to download the wiki page"));
+        }
+    });
 }
 
-void FileDownloader::grabFile(const QUrl& url, std::function<void(QByteArray)> callback)
+bool FileDownloader::writeFile(const QString& file_path, const QByteArray& data)
 {
-    connect(m_network_manager, &QNetworkAccessManager::finished,
-            [ c = std::move(callback), self = this ](QNetworkReply * reply) {
-                auto data = reply->readAll();
-                reply->deleteLater();
-                self->deleteLater();
-                c(std::move(data));
-            });
-    m_network_manager->get(QNetworkRequest{url});
+    bool res = false;
+    auto* f = new QFile{file_path};
+    if(f->open(QIODevice::WriteOnly))
+        if(f->write(data) == data.size()) res = true;
+    f->deleteLater();
+    return res;
 }

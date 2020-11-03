@@ -17,9 +17,46 @@ Window {
         anchors.right: parent.right 
 
         model: achievements_model
-        delegate: Text 
+        delegate: Rectangle
         {
-            text: name + ": "
+            height: 60
+            Rectangle
+            {
+                id: image
+                height: 60
+                width: 60
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+            }
+            Rectangle
+            {
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.left: image.right
+                anchors.right: parent.right
+
+                Text 
+                {
+                    id: name_label
+                    text: name + " : "
+                    font.pointSize: 20
+
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right 
+                }
+                Text 
+                {
+                    text: description
+
+                    anchors.top: name_label.bottom
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right 
+                }
+            }
         }
     }
 

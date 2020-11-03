@@ -7,14 +7,14 @@
 #include <QDir>
 #include <QList>
 
-class AchivementHtmlParser
+class AchievementHtmlParser
 {
 public:
-    explicit AchivementHtmlParser(const QDir& data_folder);
+    explicit AchievementHtmlParser(const QDir& data_folder);
 
-    ~AchivementHtmlParser() = default;
+    ~AchievementHtmlParser() = default;
 
-    Result<QList<Achievemevent>> parse(const QByteArray& full_html);
+    Result<QList<Achievement>> parse(const QByteArray& full_html);
 
 private:
     const QDir m_data_folder;

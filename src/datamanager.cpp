@@ -18,7 +18,7 @@ using std::placeholders::_1;
 
 namespace
 {
-QJsonObject toJson(const Achievemevent& achivement)
+QJsonObject toJson(const Achievement& achivement)
 {
     QJsonObject res;
     res["description"] = achivement.description;
@@ -73,18 +73,18 @@ std::function<Result<QString>()> findString(const QJsonObject& json, const QStri
     };
 }
 
-Result<Achievemevent> parseAchievement(const QJsonObject& json)
+Result<Achievement> parseAchievement(const QJsonObject& json)
 {
     return stackIndependantResults(findString(json, "title"), findString(json, "description"),
                                    findString(json, "image"))
         .map([](const std::tuple<QString, QString, QString> tuple) {
-            return Achievemevent{std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple)};
+            return Achievement{std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple)};
         });
 }
 
-Result<QList<Achievemevent>> parseAchievements(QJsonArray json)
+Result<QList<Achievement>> parseAchievements(QJsonArray json)
 {
-    QList<Achievemevent> res;
+    QList<Achievement> res;
     for(const auto& obj : json)
     {
         if(!obj.isObject()) return tl::make_unexpected(QString{"not a json object"});
@@ -160,14 +160,14 @@ QFileInfo DataManager::dataImagesFolder() const
 
 void DataManager::parseAchievementHtml(Result<QByteArray> html)
 {
-    AchivementHtmlParser parser{dataFolder().absolutePath()};
+    AchievementHtmlParser parser{dataFolder().absolutePath()};
     html.and_then([&parser](QByteArray html) { return parser.parse(html); })
         .map(std::bind(&DataManager::saveAchivements, this, _1))
         .or_else(&printError);
     setIsWorking(false);
 }
 
-void DataManager::saveAchivements(const QList<Achievemevent>& res)
+void DataManager::saveAchivements(const QList<Achievement>& res)
 {
     setAchivements(res);
     writeJsonFile();
@@ -190,8 +190,8 @@ void DataManager::downloadImages()
 void DataManager::writeJsonFile()
 {
     QJsonArray arr;
-    for(const auto& Achievemevent : m_achivements)
-        arr << toJson(Achievemevent);
+    for(const auto& Achievement : m_achivements)
+        arr << toJson(Achievement);
     FileDownloader::writeFile(dataFile().absoluteFilePath(), QJsonDocument{arr}.toJson());
 }
 
@@ -205,7 +205,7 @@ void DataManager::parseAchievements()
                           .or_else(&printError);
 }
 
-void DataManager::setAchivements(QList<Achievemevent> res)
+void DataManager::setAchivements(QList<Achievement> res)
 {
     m_achivements = std::move(res);
     emit achievementsChanged(m_achivements);

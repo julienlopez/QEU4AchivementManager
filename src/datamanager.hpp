@@ -28,12 +28,12 @@ public:
 signals:
     void isWorkingChanged(bool);
 
-    void achievementsChanged(QList<Achievemevent>);
+    void achievementsChanged(QList<Achievement>);
 
 private:
     FileDownloader* m_file_downloader;
     bool m_is_working = false;
-    QList<Achievemevent> m_achivements;
+    QList<Achievement> m_achivements;
 
     void setIsWorking(bool b);
 
@@ -47,7 +47,7 @@ private:
 
     void parseAchievementHtml(Result<QByteArray> html);
 
-    void saveAchivements(const QList<Achievemevent>& res);
+    void saveAchivements(const QList<Achievement>& res);
 
     void downloadImages();
 
@@ -55,5 +55,5 @@ private:
 
     void parseAchievements();
 
-    void setAchivements(QList<Achievemevent> res);
+    void setAchivements(QList<Achievement> res);
 };

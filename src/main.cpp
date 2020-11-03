@@ -1,6 +1,7 @@
 #include "achievementmodel.hpp"
 #include "datamanager.hpp"
 
+#include <QFileInfo>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -17,6 +18,7 @@ int main(int argc, char* argv[])
     QObject::connect(data_manager, &DataManager::achievementsChanged, achievements_model,
                      &AchievementModel::setAchievements);
 
+    engine.rootContext()->setContextProperty("image_directory", data_manager->dataImagesFolder().absoluteFilePath());
     engine.rootContext()->setContextProperty("data_manager", data_manager);
     engine.rootContext()->setContextProperty("achievements_model", achievements_model);
 

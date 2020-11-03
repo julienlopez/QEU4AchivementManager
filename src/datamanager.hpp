@@ -43,8 +43,11 @@ private:
 
     QFileInfo dataFile() const;
     QFileInfo dataFolder() const;
+
+public:
     QFileInfo dataImagesFolder() const;
 
+private:
     void parseAchievementHtml(Result<QByteArray> html);
 
     void saveAchivements(const QList<Achievement>& res);

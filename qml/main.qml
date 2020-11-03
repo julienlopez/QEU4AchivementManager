@@ -20,11 +20,14 @@ Window {
         delegate: Rectangle
         {
             height: 60
-            Rectangle
+            Image
             {
-                id: image
+                id: image_label
                 height: 60
                 width: 60
+
+                source: "file:///" + image_directory + "/" + image
+                asynchronous: true
 
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
@@ -34,7 +37,7 @@ Window {
             {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                anchors.left: image.right
+                anchors.left: image_label.right
                 anchors.right: parent.right
 
                 Text 
@@ -49,7 +52,7 @@ Window {
                 }
                 Text 
                 {
-                    text: description
+                    text: description + " - " + image
 
                     anchors.top: name_label.bottom
                     anchors.bottom: parent.bottom

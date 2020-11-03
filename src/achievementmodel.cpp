@@ -1,5 +1,6 @@
 #include "achievementmodel.hpp"
 
+#include <QFileInfo>
 
 AchievementModel::AchievementModel(QObject* parent)
     : QAbstractListModel(parent)
@@ -20,7 +21,7 @@ QVariant AchievementModel::data(const QModelIndex& index, int role) const
     case NameRole:
         return a.title;
     case ImageRole:
-        return a.image_url;
+        return QFileInfo{a.image_url}.fileName();
     case DescriptionRole:
         return a.description;
     default:

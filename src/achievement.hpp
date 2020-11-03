@@ -2,7 +2,7 @@
 
 #include <QString>
 
-struct Achivemevent
+struct Achievemevent
 {
     QString title;
     QString description;

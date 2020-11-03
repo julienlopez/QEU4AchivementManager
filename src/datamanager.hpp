@@ -1,6 +1,6 @@
 #pragma once
 
-#include "achivement.hpp"
+#include "achievement.hpp"
 #include "result.hpp"
 
 #include <QObject>
@@ -28,12 +28,12 @@ public:
 signals:
     void isWorkingChanged(bool);
 
-    void achievementsChanged(QList<Achivemevent>);
+    void achievementsChanged(QList<Achievemevent>);
 
 private:
     FileDownloader* m_file_downloader;
     bool m_is_working = false;
-    QList<Achivemevent> m_achivements;
+    QList<Achievemevent> m_achivements;
 
     void setIsWorking(bool b);
 
@@ -47,7 +47,7 @@ private:
 
     void parseAchievementHtml(Result<QByteArray> html);
 
-    void saveAchivements(const QList<Achivemevent>& res);
+    void saveAchivements(const QList<Achievemevent>& res);
 
     void downloadImages();
 
@@ -55,5 +55,5 @@ private:
 
     void parseAchievements();
 
-    void setAchivements(QList<Achivemevent> res);
+    void setAchivements(QList<Achievemevent> res);
 };

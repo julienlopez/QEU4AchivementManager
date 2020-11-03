@@ -1,4 +1,4 @@
-#include "achivementhtmlparser.hpp"
+#include "achievementhtmlparser.hpp"
 #include "filedownloader.hpp"
 
 #include <QFile>
@@ -77,10 +77,10 @@ auto parseTitleColumn(QString html)
     html = removeUpTo(html, "<div ");
     html = removeUpTo(html, ">");
     const auto description = html.left(html.indexOf("<"));
-    return Achivemevent{title, description, image_url};
+    return Achievemevent{title, description, image_url};
 }
 
-Result<Achivemevent> parseAchivement(QString html)
+Result<Achievemevent> parseAchivement(QString html)
 {
     auto parts = splitByTag(html, "<td", "</td>");
     if(parts.size() != 7) return tl::make_unexpected("not enough columns");
@@ -88,12 +88,12 @@ Result<Achivemevent> parseAchivement(QString html)
     return res;
 }
 
-QList<Achivemevent> parseAchivements(QStringList html)
+QList<Achievemevent> parseAchivements(QStringList html)
 {
-    QList<Achivemevent> achivements;
+    QList<Achievemevent> achivements;
     for(const auto& line : html)
     {
-        parseAchivement(line).map([&achivements](Achivemevent a) { achivements << a; });
+        parseAchivement(line).map([&achivements](Achievemevent a) { achivements << a; });
     }
     return achivements;
 }
@@ -104,7 +104,7 @@ AchivementHtmlParser::AchivementHtmlParser(const QDir& data_folder)
 {
 }
 
-Result<QList<Achivemevent>> AchivementHtmlParser::parse(const QByteArray& full_html)
+Result<QList<Achievemevent>> AchivementHtmlParser::parse(const QByteArray& full_html)
 {
     return extractTheFirstTable(full_html)
         .map(&removeEmptyLines)

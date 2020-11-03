@@ -28,6 +28,8 @@ public:
 signals:
     void isWorkingChanged(bool);
 
+    void achievementsChanged(QList<Achivemevent>);
+
 private:
     FileDownloader* m_file_downloader;
     bool m_is_working = false;
@@ -50,4 +52,8 @@ private:
     void downloadImages();
 
     void writeJsonFile();
+
+    void parseAchievements();
+
+    void setAchivements(QList<Achivemevent> res);
 };

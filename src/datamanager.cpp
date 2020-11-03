@@ -2,6 +2,7 @@
 
 #include "achivementhtmlparser.hpp"
 #include "filedownloader.hpp"
+#include "result_utilities.hpp"
 
 #include <QDir>
 #include <QFileInfo>
@@ -31,6 +32,71 @@ void printError(const QString& error)
     qDebug() << "error : " << error;
 }
 
+Result<QString> readFileAsString(const QString& file_path)
+{
+    if(QFileInfo{file_path}.isReadable() == false) return tl::make_unexpected(file_path + " is not readable");
+    qDebug() << file_path << "ok!";
+    auto* file = new QFile(file_path);
+    if(!file->open(QIODevice::ReadOnly)) return tl::make_unexpected(QString{"Unable to open file."});
+    QTextStream stream{file};
+    const auto res = stream.readAll();
+    file->deleteLater();
+    return res;
+}
+
+Result<QJsonDocument> parseJson(QString str)
+{
+    QJsonParseError err;
+    const auto res = QJsonDocument::fromJson(str.toUtf8(), &err);
+    if(err.error == QJsonParseError::NoError)
+        return res;
+    else
+        return tl::make_unexpected(err.errorString());
+}
+
+Result<QJsonArray> documentToArray(QJsonDocument json)
+{
+    if(json.isArray())
+        return json.array();
+    else
+        return tl::unexpected(QString("not a json array"));
+}
+
+std::function<Result<QString>()> findString(const QJsonObject& json, const QString& key)
+{
+    return [&]() -> Result<QString> {
+        const auto res = json.value(key);
+        if(res.isString())
+            return res.toString();
+        else
+            return tl::unexpected("Unable to find " + key);
+    };
+}
+
+Result<Achivemevent> parseAchievement(const QJsonObject& json)
+{
+    return stackIndependantResults(findString(json, "title"), findString(json, "description"),
+                                   findString(json, "image"))
+        .map([](const std::tuple<QString, QString, QString> tuple) {
+            return Achivemevent{std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple)};
+        });
+}
+
+Result<QList<Achivemevent>> parseAchievements(QJsonArray json)
+{
+    QList<Achivemevent> res;
+    for(const auto& obj : json)
+    {
+        if(!obj.isObject()) return tl::make_unexpected(QString{"not a json object"});
+        const auto achievement = parseAchievement(obj.toObject());
+        if(achievement)
+            res << *achievement;
+        else
+            return tl::make_unexpected(achievement.error());
+    }
+    return res;
+}
+
 } // namespace
 
 DataManager::DataManager(QNetworkAccessManager* network_manager, QObject* parent)
@@ -46,11 +112,18 @@ bool DataManager::isWorking() const
 
 void DataManager::checkOrDownloadData()
 {
-    if(isDataFolderComplete()) return;
+    if(isDataFolderComplete())
+    {
+        parseAchievements();
+        return;
+    }
+    else
+    {
     setIsWorking(true);
     createDataFolder();
     m_file_downloader->downloadFile("Achievements",
                                     std::bind(std::mem_fn(&DataManager::parseAchievementHtml), this, _1));
+    }
 }
 
 void DataManager::setIsWorking(bool b)
@@ -96,7 +169,7 @@ void DataManager::parseAchievementHtml(Result<QByteArray> html)
 
 void DataManager::saveAchivements(const QList<Achivemevent>& res)
 {
-    m_achivements = res;
+    setAchivements(res);
     writeJsonFile();
     downloadImages();
 }
@@ -120,4 +193,20 @@ void DataManager::writeJsonFile()
     for(const auto& achivemevent : m_achivements)
         arr << toJson(achivemevent);
     FileDownloader::writeFile(dataFile().absoluteFilePath(), QJsonDocument{arr}.toJson());
+}
+
+void DataManager::parseAchievements()
+{
+    const auto json = readFileAsString(dataFile().absoluteFilePath())
+                          .and_then(&parseJson)
+                          .and_then(&documentToArray)
+                          .and_then(&::parseAchievements)
+                          .map(std::bind(&DataManager::setAchivements, this, _1))
+                          .or_else(&printError);
+}
+
+void DataManager::setAchivements(QList<Achivemevent> res)
+{
+    m_achivements = std::move(res);
+    emit achievementsChanged(m_achivements);
 }

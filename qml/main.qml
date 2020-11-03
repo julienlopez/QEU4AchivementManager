@@ -7,6 +7,22 @@ Window {
     height: 480
     title: qsTr("QEU4AchivementManager")
 
+    ListView
+    {
+        id: achievement_list
+
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right 
+
+        model: achievements_model
+        delegate: Text 
+        {
+            text: name + ": "
+        }
+    }
+
     Rectangle
     {
         id: splash

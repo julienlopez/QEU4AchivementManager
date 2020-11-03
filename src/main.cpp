@@ -1,3 +1,4 @@
+#include "achievementmodel.hpp"
 #include "datamanager.hpp"
 
 #include <QGuiApplication>
@@ -12,7 +13,12 @@ int main(int argc, char* argv[])
 
     QQmlApplicationEngine engine;
     auto* data_manager = new DataManager(engine.networkAccessManager(), &app);
+    auto* achievements_model = new AchievementModel(&app);
+    QObject::connect(data_manager, &DataManager::achievementsChanged, achievements_model,
+                     &AchievementModel::setAchievements);
+
     engine.rootContext()->setContextProperty("data_manager", data_manager);
+    engine.rootContext()->setContextProperty("achievements_model", achievements_model);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app,

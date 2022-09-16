@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
+import QtQuick.Controls 2.1
 
 Window {
     visible: true
@@ -14,7 +15,11 @@ Window {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: parent.right 
+        anchors.right: parent.right
+
+        ScrollBar.vertical: ScrollBar {
+            active: true
+        }
 
         model: achievements_model
         delegate: Rectangle

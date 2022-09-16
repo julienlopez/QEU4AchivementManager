@@ -65,6 +65,12 @@ QString removeUpTo(QString str, const QString& token)
     return str.right(str.size() - pos - token.size());
 }
 
+QString parseTitleWithLink(QString html)
+{
+    auto res = html.right(html.size() - html.indexOf(">") - 1);
+    return res.left(res.indexOf("<"));
+}
+
 auto parseTitleColumn(QString html)
 {
     html = removeUpTo(html, "<img ");
@@ -73,7 +79,8 @@ auto parseTitleColumn(QString html)
     html = removeUpTo(html, "<div ");
     html = removeUpTo(html, "<div ");
     html = removeUpTo(html, ">");
-    const auto title = html.left(html.indexOf("<"));
+    auto title = html.left(html.indexOf("<"));
+    if(title.isEmpty()) title = parseTitleWithLink(html);
     html = removeUpTo(html, "<div ");
     html = removeUpTo(html, ">");
     const auto description = html.left(html.indexOf("<"));

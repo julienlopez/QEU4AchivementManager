@@ -26,7 +26,7 @@ Window {
                 height: 60
                 width: 60
 
-                source: "file:///" + image_directory + "/" + image
+                source: "file:///" + image_directory + "/" + encodeURIComponent(image)
                 asynchronous: true
 
                 anchors.top: parent.top

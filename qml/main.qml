@@ -57,7 +57,7 @@ Window {
                 }
                 Text 
                 {
-                    text: description + " - " + image
+                    text: description
 
                     anchors.top: name_label.bottom
                     anchors.bottom: parent.bottom

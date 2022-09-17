@@ -1,12 +1,36 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
-import QtQuick.Controls 2.1
+import QtQuick.Controls 2.5
 
-Window {
+ApplicationWindow
+{
     visible: true
     width: 640
     height: 480
     title: qsTr("QEU4AchivementManager")
+
+    menuBar: MenuBar
+    {
+        Menu
+        {
+            title: qsTr("Profile")
+            Action
+            {
+                text: qsTr("&New...")
+            }
+            Action
+            {
+                text: qsTr("&Open...")
+            }
+            MenuSeparator { }
+            Action
+            {
+                text: qsTr("&Quit")
+                onTriggered: Qt.quit();
+            }
+        }
+
+    }
 
     ListView
     {

@@ -1,12 +1,11 @@
 #include "datamanager.hpp"
 
 #include "achievementhtmlparser.hpp"
+#include "datafolders.hpp"
 #include "filedownloader.hpp"
 #include "result_utilities.hpp"
 
 #include <QDir>
-#include <QFileInfo>
-#include <QGuiApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -134,33 +133,28 @@ void DataManager::setIsWorking(bool b)
 
 void DataManager::createDataFolder()
 {
-    if(!dataFolder().isDir()) QDir().mkdir(dataFolder().filePath());
+    if(!DataFolders::dataFolder().isDir()) QDir().mkdir(DataFolders::dataFolder().filePath());
     if(!dataImagesFolder().isDir()) QDir().mkdir(dataImagesFolder().filePath());
 }
 
 bool DataManager::isDataFolderComplete() const
 {
-    return dataFolder().isDir() && dataFile().isReadable() && dataImagesFolder().isDir();
+    return DataFolders::dataFolder().isDir() && dataFile().isReadable() && dataImagesFolder().isDir();
 }
 
 QFileInfo DataManager::dataFile() const
 {
-    return QFileInfo{QDir{dataFolder().filePath()}.absoluteFilePath("achivements.json")};
-}
-
-QFileInfo DataManager::dataFolder() const
-{
-    return QFileInfo{qGuiApp->applicationDirPath() + QDir::separator() + "data"};
+    return QFileInfo{QDir{DataFolders::dataFolder().filePath()}.absoluteFilePath("achivements.json")};
 }
 
 QFileInfo DataManager::dataImagesFolder() const
 {
-    return QFileInfo{QDir{dataFolder().filePath()}.absoluteFilePath("images")};
+    return DataFolders::dataImagesFolder();
 }
 
 void DataManager::parseAchievementHtml(Result<QByteArray> html)
 {
-    AchievementHtmlParser parser{dataFolder().absolutePath()};
+    AchievementHtmlParser parser{DataFolders::dataFolder().absolutePath()};
     html.and_then([&parser](QByteArray html) { return parser.parse(html); })
         .map(std::bind(&DataManager::saveAchivements, this, _1))
         .or_else(&printError);

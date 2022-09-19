@@ -14,15 +14,27 @@ ApplicationWindow
         Menu
         {
             title: qsTr("Profile")
+
+            MenuItem
+            {
+                text: profile_manager.current_profile_name
+            }
+
+            MenuSeparator { }
+
             Action
             {
                 text: qsTr("&New...")
             }
+
             Action
             {
                 text: qsTr("&Open...")
+                enabled: profile_manager.available_profile > 0
             }
+
             MenuSeparator { }
+
             Action
             {
                 text: qsTr("&Quit")

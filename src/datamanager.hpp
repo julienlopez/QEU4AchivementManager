@@ -42,7 +42,6 @@ private:
     bool isDataFolderComplete() const;
 
     QFileInfo dataFile() const;
-    QFileInfo dataFolder() const;
 
 public:
     QFileInfo dataImagesFolder() const;

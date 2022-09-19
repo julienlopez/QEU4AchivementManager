@@ -1,5 +1,6 @@
 #include "achievementmodel.hpp"
 #include "datamanager.hpp"
+#include "profilemanager.hpp"
 
 #include <QFileInfo>
 #include <QGuiApplication>
@@ -17,10 +18,12 @@ int main(int argc, char* argv[])
     auto* achievements_model = new AchievementModel(&app);
     QObject::connect(data_manager, &DataManager::achievementsChanged, achievements_model,
                      &AchievementModel::setAchievements);
+    auto* profile_manager = new ProfileManager(&app);
 
     engine.rootContext()->setContextProperty("image_directory", data_manager->dataImagesFolder().absoluteFilePath());
     engine.rootContext()->setContextProperty("data_manager", data_manager);
     engine.rootContext()->setContextProperty("achievements_model", achievements_model);
+    engine.rootContext()->setContextProperty("profile_manager", profile_manager);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app,

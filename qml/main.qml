@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.5
+import QtQuick.Layouts 1.1
 
 ApplicationWindow
 {
@@ -8,6 +9,52 @@ ApplicationWindow
     width: 640
     height: 480
     title: qsTr("QEU4AchivementManager")
+
+    Popup {
+        id: new_profile_popup
+
+        width: 300
+        height: 200
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+        anchors.centerIn: parent
+        
+        ColumnLayout 
+        {
+            anchors.fill: parent
+            Text 
+            { 
+                text: qsTr("new profile name")
+                anchors.horizontalCenter : parent.center
+            }
+            TextField {
+                id: new_profile_name
+                placeholderText: qsTr("Enter a profile name")
+
+                height: 50
+                width: 0.8 * parent.width
+                anchors.horizontalCenter : parent.center
+            }
+            RowLayout
+            {
+                Button
+                {
+                    text: qsTr("Cancel")
+                    onClicked : new_profile_popup.close()
+                }
+
+                Button
+                {
+                    text: qsTr("Create")
+                    onClicked : profile_manager.createNewProfile(new_profile_name.text)
+                    enabled : new_profile_name.text != ""
+                }
+            
+            }
+        }
+    }
 
     menuBar: MenuBar
     {
@@ -25,6 +72,7 @@ ApplicationWindow
             Action
             {
                 text: qsTr("&New...")
+                onTriggered: new_profile_popup.open()
             }
 
             Action

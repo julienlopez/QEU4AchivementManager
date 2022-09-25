@@ -21,7 +21,7 @@ public:
 
     QString currentProfileName() const;
 
-    void createNewProfile(const QString& name);
+    Q_INVOKABLE void createNewProfile(const QString& name);
 
     void loadProfile(const QString& name);
 

@@ -19,6 +19,8 @@ int main(int argc, char* argv[])
     QObject::connect(data_manager, &DataManager::achievementsChanged, achievements_model,
                      &AchievementModel::setAchievements);
     auto* profile_manager = new ProfileManager(&app);
+    QObject::connect(data_manager, &DataManager::achievementsChanged, profile_manager,
+                     &ProfileManager::setAchievements);
 
     engine.rootContext()->setContextProperty("image_directory", data_manager->dataImagesFolder().absoluteFilePath());
     engine.rootContext()->setContextProperty("data_manager", data_manager);

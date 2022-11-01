@@ -31,7 +31,7 @@ public:
     int availableProfiles() const;
 
 public slots:
-    void setAchivements(const QList<Achievement>& achievements);
+    void setAchievements(const QList<Achievement>& achievements);
 
 signals:
     void currentProfileChanged();

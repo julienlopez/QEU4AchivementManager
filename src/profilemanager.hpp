@@ -1,8 +1,11 @@
 #pragma once
 
+#include "achievement.hpp"
+#include "profile.hpp"
+
 #include <QObject>
 
-#include <optional>
+#include <boost/optional.hpp>
 
 class ProfileManager : public QObject
 {
@@ -27,6 +30,9 @@ public:
 
     int availableProfiles() const;
 
+public slots:
+    void setAchivements(const QList<Achievement>& achievements);
+
 signals:
     void currentProfileChanged();
 
@@ -35,5 +41,6 @@ signals:
     void availableProfilesChanged(int);
 
 private:
-    std::optional<QString> m_current_profile;
+    boost::optional<Profile> m_current_profile;
+    QList<Achievement> m_achievements;
 };

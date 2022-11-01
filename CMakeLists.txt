@@ -25,6 +25,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #endif()
 
 find_package(Qt5 COMPONENTS Core Quick Network REQUIRED)
+find_package(boost REQUIRED COMPONENTS Boost::headers)
 
 file (GLOB CppSrc
         src/*.cpp
@@ -43,14 +44,13 @@ else()
     add_executable(QEU4AchivementManager
       ${CppSrc}
       qml.qrc
-      images.qrc
-    )
+      images.qrc)
 endif()
 
 target_compile_definitions(QEU4AchivementManager
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(QEU4AchivementManager
-  PRIVATE Qt5::Core Qt5::Quick)
+  PRIVATE Qt5::Core Qt5::Quick Boost::headers)
 
   
 # copy the required librairies

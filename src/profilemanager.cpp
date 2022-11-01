@@ -2,6 +2,8 @@
 
 #include "datafolders.hpp"
 
+#include <QDebug>
+
 ProfileManager::ProfileManager(QObject* parent)
     : QObject{parent}
     , m_current_profile{std::nullopt}
@@ -20,7 +22,10 @@ QString ProfileManager::currentProfileName() const
 
 void ProfileManager::createNewProfile(const QString& name)
 {
+    qDebug() << "ProfileManager::createNewProfile(" << name << ")";
     m_current_profile = name;
+    emit currentProfileChanged();
+    emit currentProfileNameChanged(name);
 }
 
 void ProfileManager::loadProfile(const QString& name)

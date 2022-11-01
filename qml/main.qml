@@ -24,12 +24,15 @@ ApplicationWindow
         ColumnLayout 
         {
             anchors.fill: parent
+
             Text 
             { 
                 text: qsTr("new profile name")
                 anchors.horizontalCenter : parent.center
             }
-            TextField {
+
+            TextField
+            {
                 id: new_profile_name
                 placeholderText: qsTr("Enter a profile name")
 
@@ -37,6 +40,7 @@ ApplicationWindow
                 width: 0.8 * parent.width
                 anchors.horizontalCenter : parent.center
             }
+
             RowLayout
             {
                 Button
@@ -48,8 +52,12 @@ ApplicationWindow
                 Button
                 {
                     text: qsTr("Create")
-                    onClicked : profile_manager.createNewProfile(new_profile_name.text)
                     enabled : new_profile_name.text != ""
+                    onClicked : 
+                    {
+                        profile_manager.createNewProfile(new_profile_name.text)
+                        new_profile_popup.close()
+                    }
                 }
             
             }

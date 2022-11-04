@@ -1,9 +1,12 @@
 #include "achievementmodel.hpp"
 
+#include "icurrentprofilestatus.hpp"
+
 #include <QFileInfo>
 
-AchievementModel::AchievementModel(QObject* parent)
+AchievementModel::AchievementModel(const ICurrentProfileStatus& current_profile_status, QObject* parent)
     : QAbstractListModel(parent)
+    , m_current_profile_status(current_profile_status)
 {
 }
 
@@ -24,6 +27,10 @@ QVariant AchievementModel::data(const QModelIndex& index, int role) const
         return QFileInfo{a.image_url}.fileName();
     case DescriptionRole:
         return a.description;
+    case IsTodo:
+        return m_current_profile_status.isTodo(a.title);
+    case IsDone:
+        return m_current_profile_status.isDone(a.title);
     default:
         return {};
     }
@@ -31,11 +38,11 @@ QVariant AchievementModel::data(const QModelIndex& index, int role) const
 
 QHash<int, QByteArray> AchievementModel::roleNames() const
 {
-    QHash<int, QByteArray> roles;
-    roles[NameRole] = "name";
-    roles[ImageRole] = "image";
-    roles[DescriptionRole] = "description";
-    return roles;
+    return {{NameRole, "name"},
+            {ImageRole, "image"},
+            {DescriptionRole, "description"},
+            {IsDone, "is_done"},
+            {IsTodo, "is_todo"}};
 }
 
 void AchievementModel::setAchievements(QList<Achievement> achievements)

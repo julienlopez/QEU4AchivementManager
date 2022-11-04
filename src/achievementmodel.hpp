@@ -4,6 +4,8 @@
 
 #include <QAbstractListModel>
 
+class ICurrentProfileStatus;
+
 class AchievementModel : public QAbstractListModel
 {
 public:
@@ -11,10 +13,12 @@ public:
     {
         NameRole = Qt::UserRole + 1,
         ImageRole,
-        DescriptionRole
+        DescriptionRole,
+        IsTodo,
+        IsDone
     };
 
-    explicit AchievementModel(QObject* parent = nullptr);
+    explicit AchievementModel(const ICurrentProfileStatus& current_profile_status, QObject* parent = nullptr);
 
     virtual ~AchievementModel() = default;
 
@@ -27,5 +31,6 @@ public:
     void setAchievements(QList<Achievement> achievements);
 
 private:
+    const ICurrentProfileStatus& m_current_profile_status; 
     QList<Achievement> m_achievements;
 };

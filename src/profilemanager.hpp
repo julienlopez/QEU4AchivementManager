@@ -1,13 +1,14 @@
 #pragma once
 
 #include "achievement.hpp"
+#include "icurrentprofilestatus.hpp"
 #include "profile.hpp"
 
 #include <QObject>
 
 #include <boost/optional.hpp>
 
-class ProfileManager : public QObject
+class ProfileManager : public QObject, public ICurrentProfileStatus
 {
     Q_OBJECT
 
@@ -20,7 +21,7 @@ public:
 
     virtual ~ProfileManager() = default;
 
-    bool hasACurrentProfile() const;
+    bool hasACurrentProfile() const override;
 
     QString currentProfileName() const;
 
@@ -29,6 +30,10 @@ public:
     void loadProfile(const QString& name);
 
     int availableProfiles() const;
+
+    bool isTodo(const QString& achievement_title) const override;
+
+    bool isDone(const QString& achievement_title) const override;
 
 public slots:
     void setAchievements(const QList<Achievement>& achievements);
@@ -43,4 +48,6 @@ signals:
 private:
     boost::optional<Profile> m_current_profile;
     QList<Achievement> m_achievements;
+
+    template <class Member> bool isProperty(const QString& achievement_title, Member mem_ptr) const;
 };

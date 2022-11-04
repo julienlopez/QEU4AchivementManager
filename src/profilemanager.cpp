@@ -61,6 +61,11 @@ void writeProfile(const Profile& profile)
     FileDownloader::writeFile(file_path, QJsonDocument{toJson(profile)}.toJson());
 }
 
+auto hasTitle(const QString& achievement_title)
+{
+    return [&achievement_title](const AchievementStatus& ach) { return ach.achievement_title == achievement_title; };
+}
+
 } // namespace
 
 ProfileManager::ProfileManager(QObject* parent)
@@ -101,7 +106,26 @@ int ProfileManager::availableProfiles() const
     return 0;
 }
 
+bool ProfileManager::isTodo(const QString& achievement_title) const
+{
+    return isProperty(achievement_title, &AchievementStatus::is_todo);
+}
+
+bool ProfileManager::isDone(const QString& achievement_title) const
+{
+    return isProperty(achievement_title, &AchievementStatus::is_done);
+}
+
 void ProfileManager::setAchievements(const QList<Achievement>& achievements)
 {
     m_achievements = achievements;
+}
+
+template <class Member> bool ProfileManager::isProperty(const QString& achievement_title, Member mem_ptr) const
+{
+    if(!hasACurrentProfile()) return false;
+    const auto it = std::find_if(std::begin(m_current_profile->achivements), std::end(m_current_profile->achivements),
+                                 hasTitle(achievement_title));
+    if(it == std::end(m_current_profile->achivements)) return false;
+    return (*it).*mem_ptr;
 }

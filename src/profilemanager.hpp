@@ -13,7 +13,7 @@ class ProfileManager : public QObject, public ICurrentProfileStatus
     Q_OBJECT
 
     Q_PROPERTY(bool has_a_current_profile READ hasACurrentProfile NOTIFY currentProfileChanged)
-    Q_PROPERTY(int available_profile READ availableProfiles NOTIFY availableProfilesChanged)
+    // Q_PROPERTY(int available_profile READ availableProfiles NOTIFY availableProfilesChanged)
     Q_PROPERTY(QString current_profile_name READ currentProfileName NOTIFY currentProfileNameChanged)
 
 public:
@@ -27,9 +27,9 @@ public:
 
     Q_INVOKABLE void createNewProfile(const QString& name);
 
-    void loadProfile(const QString& name);
+    Q_INVOKABLE void loadProfile(const QString& name);
 
-    int availableProfiles() const;
+    Q_INVOKABLE QStringList availableProfiles() const;
 
     bool isTodo(const QString& achievement_title) const override;
 

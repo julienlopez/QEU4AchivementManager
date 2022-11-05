@@ -10,7 +10,8 @@ ApplicationWindow
     height: 480
     title: qsTr("QEU4AchivementManager")
 
-    Popup {
+    Popup
+    {
         id: new_profile_popup
 
         width: 300
@@ -64,6 +65,93 @@ ApplicationWindow
         }
     }
 
+    Popup
+    {
+        id: load_profile_popup
+
+        width: 300
+        height: 200
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+        anchors.centerIn: parent
+        
+        Text 
+        { 
+            id: label
+            text: qsTr("load a profile")
+
+            height: 40
+            width: parent.width
+            anchors.horizontalCenter : parent.center
+            anchors.top: parent.top
+        }
+
+        ListView
+        {
+            id: profile_list
+            
+            height: parent.height - 80
+            width: parent.width
+            anchors.horizontalCenter : parent.center
+            anchors.top: label.bottom
+
+            ScrollBar.vertical: ScrollBar
+            {
+                active: true
+            }
+
+            model: profile_manager.availableProfiles()
+            
+            delegate: Rectangle
+            {
+                width: parent.width
+                height: 40
+
+                Text
+                {
+                    anchors.fill: parent
+                    text: modelData
+                }
+                MouseArea
+                {
+                    anchors.fill: parent
+                    onClicked: profile_list.currentIndex = index
+                }
+            }
+        }
+        
+        Rectangle
+        {
+            width: parent.width
+            anchors.horizontalCenter : parent.center
+            anchors.top: profile_list.bottom
+
+            RowLayout
+            {
+            anchors.fill: parent
+
+                Button
+                {
+                    text: qsTr("Cancel")
+                    onClicked : load_profile_popup.close()
+                }
+            
+                Button
+                {
+                    text: qsTr("Load")
+                    onClicked : 
+                    {
+                        profile_manager.loadProfile(profile_list.model[profile_list.currentIndex])
+                        load_profile_popup.close()
+                    }
+                }
+            
+            }
+        }
+    }
+
     menuBar: MenuBar
     {
         Menu
@@ -86,7 +174,8 @@ ApplicationWindow
             Action
             {
                 text: qsTr("&Open...")
-                enabled: profile_manager.available_profile > 0
+                enabled: profile_manager.availableProfiles().size() > 0
+                onTriggered: load_profile_popup.open()
             }
 
             MenuSeparator { }
@@ -117,6 +206,9 @@ ApplicationWindow
         delegate: Rectangle
         {
             height: 60
+
+
+
             Image
             {
                 id: image_label
@@ -157,6 +249,19 @@ ApplicationWindow
                     anchors.right: parent.right 
                 }
             }
+            // Image
+            // {
+            //     id: image_label
+            //     height: 60
+            //     width: 60
+            // 
+            //     source: "file:///" + image_directory + "/" + encodeURIComponent(image)
+            //     asynchronous: true
+            // 
+            //     anchors.top: parent.top
+            //     anchors.bottom: parent.bottom
+            //     anchors.left: parent.left
+            // }
         }
     }
 

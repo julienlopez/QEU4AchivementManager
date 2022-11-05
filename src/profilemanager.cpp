@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include <QDir>
+#include <QDirIterator>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -54,16 +55,27 @@ QJsonObject toJson(const Profile& profile)
     return res;
 }
 
+QDir profilesDirectory()
+{
+    return DataFolders::dataProfilesFolder().absoluteFilePath();
+}
+
 void writeProfile(const Profile& profile)
 {
-    const QDir directory{DataFolders::dataProfilesFolder().absoluteFilePath()};
-    const auto file_path = directory.absoluteFilePath(profile.name + ".json");
+    const auto file_path = profilesDirectory().absoluteFilePath(profile.name + ".json");
     FileDownloader::writeFile(file_path, QJsonDocument{toJson(profile)}.toJson());
 }
 
 auto hasTitle(const QString& achievement_title)
 {
     return [&achievement_title](const AchievementStatus& ach) { return ach.achievement_title == achievement_title; };
+}
+
+QString removeExtension(const QString& str)
+{
+    const auto pos = str.lastIndexOf('.');
+    if(pos < str.size()) return str.left(str.size() - pos - 1);
+    return str;
 }
 
 } // namespace
@@ -97,13 +109,16 @@ void ProfileManager::createNewProfile(const QString& name)
 
 void ProfileManager::loadProfile(const QString& name)
 {
+    qDebug() << "ProfileManager::loadProfile(" << name << ")";
     // TODO ProfileManager::loadProfile
     // m_current_profile = name;
 }
 
-int ProfileManager::availableProfiles() const
+QStringList ProfileManager::availableProfiles() const
 {
-    return 0;
+    auto res = profilesDirectory().entryList(QDir::Files | QDir::NoDotAndDotDot);
+    std::transform(std::begin(res), std::end(res), std::begin(res), &removeExtension);
+    return res;
 }
 
 bool ProfileManager::isTodo(const QString& achievement_title) const
